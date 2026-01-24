@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: postgres
+    password: Hyder@014
+    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 0
+      idle-timeout: 10000
+      max-lifetime: 300000
+      connection-timeout: 10000
+      pool-name: EcommercePool
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
