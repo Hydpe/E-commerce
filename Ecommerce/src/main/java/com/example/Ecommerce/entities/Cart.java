@@ -17,7 +17,7 @@ public class Cart {
 
     @OneToOne(mappedBy="cart",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonBackReference  //inverse sise so cart Backs to user in json
-    private User user;  //owning side is user becuse foreign key here
+    private User user;  //owning side is user because foreign key here
 
     public int getId() {
         return id;

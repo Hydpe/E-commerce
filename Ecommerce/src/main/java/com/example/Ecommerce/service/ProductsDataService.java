@@ -36,4 +36,8 @@ public class ProductsDataService implements IProductsDataImp {
     public ProductsData findById(Integer id) {
         return productsDataRepo.findById(id).orElse(null);
     }
+
+    public List<ProductsData> findAll() {
+        return productsDataRepo.findAll();
+    }
 }

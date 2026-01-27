@@ -1,52 +1,61 @@
 package com.example.Ecommerce.service;
 
 import com.example.Ecommerce.entities.*;
-import com.example.Ecommerce.jwtUtility.JwtUtil;
 import com.example.Ecommerce.repository.CartRepo;
 import com.example.Ecommerce.repository.OrderRepo;
 import com.example.Ecommerce.repository.ProductsRepo;
 import com.example.Ecommerce.repository.UserRepo;
 import com.example.Ecommerce.serviceInterface.IuserService;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 @Service
 public class UserService implements IuserService {
-    private JwtUtil jwtUtil;
-    ProductsRepo productsRepo;
-    UserRepo repo;
-    OrderRepo orderRepo;
-    CartRepo cartRepo;
-    @Autowired
-    public UserService(UserRepo repository, JwtUtil jwtUtil,OrderRepo orderRepo, ProductsRepo productsRepo, CartRepo cartRepo) {
 
-        this.repo = repository;
-        this.jwtUtil = jwtUtil;
+    private final UserRepo repo;
+    private final ProductsRepo productsRepo;
+    private final OrderRepo orderRepo;
+    private final CartRepo cartRepo;
+
+    @Autowired
+    public UserService(UserRepo repo, OrderRepo orderRepo, ProductsRepo productsRepo, CartRepo cartRepo) {
+        this.repo = repo;
         this.orderRepo = orderRepo;
         this.productsRepo = productsRepo;
         this.cartRepo = cartRepo;
     }
+
     @Override
-    public String createUser(SignUp user)
-    {
-            boolean T=repo.existsByEmail(user.getEmail());
-            if(!T) {
-                User newUser = new User();
-                newUser.setEmail(user.getEmail());
-                newUser.setPassword(user.getPassword());
-                newUser.setName(user.getName());
-                newUser.getCart();
-                Cart newCart = new Cart();
-                newCart.getProducts();
-                newCart.setUser(newUser);
-                newUser.setCart(newCart);
-                repo.save(newUser);
-                 return "Success";
-            }
-            else  {
-                return "User Already Exists" ;
-            }
+    public String createUser(SignUp user) {
+        if (repo.existsByEmail(user.getEmail())) return "User already exists";
+
+        User newUser = new User();
+        newUser.setName(user.getName());
+        newUser.setEmail(user.getEmail());
+        newUser.setPassword(user.getPassword());
+
+        Cart cart = new Cart();
+        cart.setUser(newUser);
+        cart.setProducts(new ArrayList<>());
+
+        newUser.setCart(cart);
+
+        repo.save(newUser);
+        return "Success";
+    }
+
+    @Override
+    public User checkLogin(String email, String password) {
+        User user = repo.findByEmail(email);
+        if (user != null && password.equals(user.getPassword())) return user;
+        return null;
+    }
+
+    @Override
+    public User saveUser(User user) {
+        return repo.save(user);
     }
     @Override
     public User getUser(String email)
@@ -54,69 +63,29 @@ public class UserService implements IuserService {
         return repo.findByEmail(email);
     }
     @Override
-    public User checkLogin(String email,String password)
-    {
-        User newUser=repo.findByEmail(email);
-        if(newUser==null || password==null || !newUser.getPassword().equals(password) ) {
-            return null;
-        }
-        return newUser;
-    }
-   @Override
-    public User getUserByToken(String token) {
-
-        if (!jwtUtil.validateToken(token)) {
-            return null;
-        }
-        String email = jwtUtil.extractEmail(token);
-        User user = getUser(email);
-        if (user == null) {
-            return null;
-        }
-        return user;
-    }
-    @Override
-    public User saveUser(User user) {
-        return repo.save(user);
-    }
-
-    @Override
     public User addProductsFromCarttoUserOrders(User user) {
-        User newUser = repo.findByEmail(user.getEmail());
-        if (newUser == null) {
-            return null;
-        }
+        if (user == null) return null;
 
         Cart cart = user.getCart();
         if (cart == null || cart.getProducts() == null || cart.getProducts().isEmpty()) {
-            throw new RuntimeException("Cart is empty or null");
+            throw new RuntimeException("Cart is empty");
         }
 
-
         Orders order = new Orders();
-        order.setUser(newUser);
-
+        order.setUser(user);
 
         for (Product p : cart.getProducts()) {
             p.setOrder(order);
             p.setCart(null);
-          //  productsRepo.save(p);
             order.getProducts().add(p);
         }
 
-
-      //  orderRepo.save(order);
-        newUser.getOrders().add(order);
-        repo.save(newUser);
-
+        user.getOrders().add(order);
+        repo.save(user);
 
         cart.getProducts().clear();
         cartRepo.save(cart);
 
-        return newUser;
+        return user;
     }
-
-
-
-
 }

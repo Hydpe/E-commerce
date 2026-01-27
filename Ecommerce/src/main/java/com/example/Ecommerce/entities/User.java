@@ -56,7 +56,7 @@ public class User {
         this.role = role;
     }
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name="cart_id") //here user is owning side foreign key//user manages cart
     @JsonManagedReference  //here i wrote this beacuse user manages cart,
     Cart cart;
@@ -67,7 +67,7 @@ public class User {
         return cart;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy="user")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER,mappedBy="user")
     @JsonManagedReference
     List<Orders>  orders=  new ArrayList<>();
     public List<Orders> getOrders() {

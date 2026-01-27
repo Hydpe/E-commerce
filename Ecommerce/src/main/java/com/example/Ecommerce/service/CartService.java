@@ -26,7 +26,7 @@ public class CartService implements IcartServiceImp {
     }
 
     @Override
-    public Cart addProductToCart(User user, ProductsData product) {
+    public Cart addProductToCart(User user, ProductsData proData) {
 
         if (user == null) {
             throw new RuntimeException("User is null. Please login first");
@@ -46,8 +46,6 @@ public class CartService implements IcartServiceImp {
             dbUser.setCart(cart);
         }
 
-
-        ProductsData proData = productsDataService.findById(product.getId());
         if (proData == null) {
             throw new RuntimeException("Product not found");
         }
@@ -61,13 +59,10 @@ public class CartService implements IcartServiceImp {
         pro.setDescription(proData.getDescription());
         pro.setCart(dbUser.getCart());
 
-
         dbUser.getCart().getProducts().add(pro);
-
 
         cartRepo.save(dbUser.getCart());
         userService.saveUser(dbUser);
-
         return dbUser.getCart();
     }
 }

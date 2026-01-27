@@ -28,7 +28,6 @@ public class Orders<O, I extends Number> {
     {
 
     }
-
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "order",cascade = CascadeType.ALL)
     @JsonManagedReference
     List<Product> products = new ArrayList<Product>();
