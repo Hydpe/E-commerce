@@ -10,6 +10,6 @@ import java.util.List;
 public interface ProductsRepo extends JpaRepository<Product,Integer> {
     //List<Product> displayProducts();
     List<Product>  findAll();
-
+    void deleteById(Integer id);
 
 }

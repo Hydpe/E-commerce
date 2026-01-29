@@ -45,14 +45,12 @@ public class UserService implements IuserService {
         repo.save(newUser);
         return "Success";
     }
-
     @Override
     public User checkLogin(String email, String password) {
         User user = repo.findByEmail(email);
         if (user != null && password.equals(user.getPassword())) return user;
         return null;
     }
-
     @Override
     public User saveUser(User user) {
         return repo.save(user);

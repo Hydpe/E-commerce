@@ -1,6 +1,8 @@
 package com.example.Ecommerce.service;
 
+import com.example.Ecommerce.entities.Category;
 import com.example.Ecommerce.entities.ProductsData;
+import com.example.Ecommerce.repository.CategoryRepo;
 import com.example.Ecommerce.repository.ProductsDataRepo;
 import com.example.Ecommerce.serviceInterface.IProductsDataImp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,32 +14,66 @@ import java.util.List;
 @Service
 public class ProductsDataService implements IProductsDataImp {
     ProductsDataRepo productsDataRepo;
+    CategoryRepo categoryRepo;
     @Autowired
-    public ProductsDataService(ProductsDataRepo productsDataRepo) {
+    public ProductsDataService(ProductsDataRepo productsDataRepo, CategoryRepo categoryRepo) {
         this.productsDataRepo = productsDataRepo;
+        this.categoryRepo = categoryRepo;
     }
 
-    @Override
-    public List<ProductsData> addAll(List<ProductsData> products) {
-        List<ProductsData> list = new ArrayList<>();
-        for(ProductsData productsData : products)
-        {
-            ProductsData p=new ProductsData();
-            p.setProductName(productsData.getProductName());
-            p.setPrice(productsData.getPrice());
-            p.setDescription(productsData.getDescription());
-            p.setImage(productsData.getImage());
-            list.add(p);
-        }
-        return productsDataRepo.saveAll(list);
-    }
+  @Override
+  public List<ProductsData> addAll(List<ProductsData> products) {
+
+      List<ProductsData> savedProducts = new ArrayList<>();
+
+      for (ProductsData incoming : products) {
+
+          if (incoming.getCategory() == null ||
+                  incoming.getCategory().getName() == null) {
+              throw new RuntimeException("Category is required");
+          }
+
+          String categoryName = incoming.getCategory().getName();
+
+          Category category = categoryRepo.findByName(categoryName);
+
+          if (category == null) {
+              category = new Category();
+              category.setName(categoryName);
+          }
+
+          ProductsData p = new ProductsData();
+          p.setProductName(incoming.getProductName());
+          p.setPrice(incoming.getPrice());
+          p.setImage(incoming.getImage());
+          p.setDescription(incoming.getDescription());
+
+
+          p.setCategory(category);
+          category.getProductsData().add(p);
+
+          categoryRepo.save(category); // cascade saves product
+          savedProducts.add(p);
+      }
+
+      return productsDataRepo.saveAll(savedProducts);
+  }
 
     @Override
     public ProductsData findById(Integer id) {
         return productsDataRepo.findById(id).orElse(null);
     }
 
+    @Override
+    public List<ProductsData> findByCategoryName(String name) {
+        return productsDataRepo.findByCategoryName(name);
+    }
+
     public List<ProductsData> findAll() {
         return productsDataRepo.findAll();
     }
-}
+      public void deleteAll()
+        {
+        productsDataRepo.deleteAll();
+        }
+  }

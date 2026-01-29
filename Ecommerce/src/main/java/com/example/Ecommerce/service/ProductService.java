@@ -16,5 +16,9 @@ public class ProductService {
         this.Repo = Repo;
     }
 
+    public void deleteProduct(int id)
+    {
+         Repo.deleteById(id);
 
+    }
 }

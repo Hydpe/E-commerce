@@ -7,4 +7,5 @@ import com.example.Ecommerce.entities.User;
 
 public interface IcartServiceImp {
     Cart addProductToCart(User user, ProductsData product);
+    Cart removeProductFromCart(User user, int id);
 }

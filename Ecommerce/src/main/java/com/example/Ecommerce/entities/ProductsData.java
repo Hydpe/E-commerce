@@ -1,5 +1,9 @@
 package com.example.Ecommerce.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -53,4 +57,18 @@ public class ProductsData {
     public void setImage(String image) {
         this.image = image;
     }
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("productsData")
+    @JoinColumn(name="category_id")
+    private Category category;
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
 }

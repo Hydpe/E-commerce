@@ -65,4 +65,16 @@ public class CartService implements IcartServiceImp {
         userService.saveUser(dbUser);
         return dbUser.getCart();
     }
+    @Override
+    public Cart removeProductFromCart(User user, int id) {
+        if (user == null) {
+            throw new RuntimeException("User is null. Please login first");
+        }
+        User dbUser = userService.getUser(user.getEmail());
+        if (dbUser == null) {
+            throw new RuntimeException("User is not found in database");
+        }
+        return null;
+
+    }
 }

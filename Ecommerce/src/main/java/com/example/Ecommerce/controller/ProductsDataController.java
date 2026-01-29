@@ -4,6 +4,7 @@ import com.example.Ecommerce.entities.ProductsData;
 import com.example.Ecommerce.repository.ProductsDataRepo;
 import com.example.Ecommerce.service.ProductsDataService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
 @RequestMapping("/ProductsData")
 public class ProductsDataController {
 
-    ProductsDataService dataService;
+    private ProductsDataService dataService;
     @Autowired
     public ProductsDataController(ProductsDataService productsDataService) {
         this.dataService = productsDataService;
@@ -26,6 +27,16 @@ public class ProductsDataController {
     @GetMapping("/all")
     public List<ProductsData> getAll() {
         return dataService.findAll();
+    }
+
+    @GetMapping("/GetCategory/{name}")
+    public List<ProductsData> getCategory(@PathVariable String name) {
+        return dataService.findByCategoryName(name);
+    }
+    @DeleteMapping("/all")
+    public ResponseEntity<String> deleteProductsRepo() {
+        dataService.deleteAll();
+        return ResponseEntity.ok("Deleted");
     }
 
 }

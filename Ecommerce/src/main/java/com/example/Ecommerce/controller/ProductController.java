@@ -14,9 +14,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/Products")
 public class ProductController {
-    ProductService productService;
-    ProductsRepo Repo;
-    ProductsDataService dataService;
+
+    private ProductService productService;
+    private ProductsRepo Repo;
+    private ProductsDataService dataService;
+
     @Autowired
     public ProductController(ProductService service, ProductsRepo Repo, ProductsDataService dataService) {
         this.productService = service;
