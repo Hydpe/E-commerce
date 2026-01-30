@@ -20,7 +20,12 @@ public class UserService implements IuserService {
     private final CartRepo cartRepo;
 
     @Autowired
-    public UserService(UserRepo repo, OrderRepo orderRepo, ProductsRepo productsRepo, CartRepo cartRepo) {
+    public UserService(
+            UserRepo repo,
+            OrderRepo orderRepo,
+            ProductsRepo productsRepo,
+            CartRepo cartRepo
+    ) {
         this.repo = repo;
         this.orderRepo = orderRepo;
         this.productsRepo = productsRepo;
@@ -29,7 +34,9 @@ public class UserService implements IuserService {
 
     @Override
     public String createUser(SignUp user) {
-        if (repo.existsByEmail(user.getEmail())) return "User already exists";
+        if (repo.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("User already exists");
+        }
 
         User newUser = new User();
         newUser.setName(user.getName());
@@ -39,33 +46,38 @@ public class UserService implements IuserService {
         Cart cart = new Cart();
         cart.setUser(newUser);
         cart.setProducts(new ArrayList<>());
-
         newUser.setCart(cart);
 
         repo.save(newUser);
         return "Success";
     }
+
     @Override
     public User checkLogin(String email, String password) {
         User user = repo.findByEmail(email);
-        if (user != null && password.equals(user.getPassword())) return user;
+        if (user != null && password.equals(user.getPassword())) {
+            return user;
+        }
         return null;
     }
+
+
     @Override
     public User saveUser(User user) {
         return repo.save(user);
     }
+
     @Override
-    public User getUser(String email)
-    {
+    public User getUser(String email) {
         return repo.findByEmail(email);
     }
+
     @Override
     public User addProductsFromCarttoUserOrders(User user) {
         if (user == null) return null;
 
         Cart cart = user.getCart();
-        if (cart == null || cart.getProducts() == null || cart.getProducts().isEmpty()) {
+        if (cart == null || cart.getProducts().isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
 
@@ -79,6 +91,8 @@ public class UserService implements IuserService {
         }
 
         user.getOrders().add(order);
+
+
         repo.save(user);
 
         cart.getProducts().clear();

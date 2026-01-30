@@ -77,21 +77,23 @@ public class User {
         this.orders = orders;
     }
 
-
     String address;
 
     public String getAddress() {
         return address;
     }
-    public void setAddress(String address) {}
-
-
-    String phone;
-    public String getPhone() {
-        return phone;
+    public void setAddress(String address) {
+        this.address = address;
     }
-    public void setPhone(String phone) {
-        this.phone = phone;
+
+    String phoneNumber;
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
 

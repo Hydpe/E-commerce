@@ -35,7 +35,7 @@ public class Cart {
         this.user = user;
     }
 
-    @OneToMany(fetch = FetchType.EAGER,mappedBy = "cart",cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "cart",cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonManagedReference  // cart manages products in json
     List<Product> products = new ArrayList<Product>();  //product is owning side.
 

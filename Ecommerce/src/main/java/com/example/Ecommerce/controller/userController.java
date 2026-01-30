@@ -4,6 +4,7 @@ import com.example.Ecommerce.entities.*;
 import com.example.Ecommerce.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,42 +26,57 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public String signup(@RequestBody SignUp user) {
-        return userService.createUser(user);
+    public ResponseEntity<?> signup(@RequestBody SignUp user) {
+        try {
+            userService.createUser(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Success");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Login login, HttpSession session) {
         User user = userService.checkLogin(login.getEmail(), login.getPassword());
         if (user != null) {
-            session.setAttribute("user", user); //  Store user in session
+            session.setAttribute("user", user);
             return ResponseEntity.ok("Login Success");
-        } else {
-            return ResponseEntity.status(401).body("Invalid credentials");
         }
+        return ResponseEntity.status(401).body("Invalid credentials");
     }
 
     @GetMapping("/getProfile")
     public User getProfile(HttpSession session) {
         User sessionUser = (User) session.getAttribute("user");
         if (sessionUser == null) return null;
+
         return userService.getUser(sessionUser.getEmail());
     }
 
     @PutMapping("/order")
-    public User checkout(@RequestParam String address, @RequestParam String phone, HttpSession session) {
-      //  session.setAttribute("user",userService.getUser(user.getEmail()));
+    public User checkout(
+            @RequestParam String address,
+            @RequestParam String phone,
+            HttpSession session
+    ) {
+        User sessionUser = (User) session.getAttribute("user");
+        if (sessionUser == null) return null;
 
-        User user = (User) session.getAttribute("user");
-        if (user == null) return null;
+
+        User user = userService.getUser(sessionUser.getEmail());
+
 
         user.setAddress(address);
-        user.setPhone(phone);
-        session.setAttribute("user",userService.getUser(user.getEmail()));
-        User user1 = (User) session.getAttribute("user");
-        user1=userService.addProductsFromCarttoUserOrders(user1);
-        return user1;
+        user.setPhoneNumber(phone);
+
+
+        user = userService.addProductsFromCarttoUserOrders(user);
+
+        session.setAttribute("user", user);
+
+        return user;
     }
+
 
     @PostMapping("/logout")
     public String logout(HttpSession session) {

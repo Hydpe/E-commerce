@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @Service
 public class CartService implements IcartServiceImp {
@@ -25,19 +27,14 @@ public class CartService implements IcartServiceImp {
         this.userService = userService;
     }
 
+    // Add product to cart
     @Override
     public Cart addProductToCart(User user, ProductsData proData) {
 
-        if (user == null) {
-            throw new RuntimeException("User is null. Please login first");
-        }
-
+        if (user == null) throw new RuntimeException("User is null. Please login first");
 
         User dbUser = userService.getUser(user.getEmail());
-        if (dbUser == null) {
-            throw new RuntimeException("User is not found in database");
-        }
-
+        if (dbUser == null) throw new RuntimeException("User not found in database");
 
         if (dbUser.getCart() == null) {
             Cart cart = new Cart();
@@ -46,10 +43,7 @@ public class CartService implements IcartServiceImp {
             dbUser.setCart(cart);
         }
 
-        if (proData == null) {
-            throw new RuntimeException("Product not found");
-        }
-
+        if (proData == null) throw new RuntimeException("Product not found");
 
         Product pro = new Product();
         pro.setProductName(proData.getProductName());
@@ -63,18 +57,39 @@ public class CartService implements IcartServiceImp {
 
         cartRepo.save(dbUser.getCart());
         userService.saveUser(dbUser);
+
         return dbUser.getCart();
     }
-    @Override
-    public Cart removeProductFromCart(User user, int id) {
-        if (user == null) {
-            throw new RuntimeException("User is null. Please login first");
-        }
-        User dbUser = userService.getUser(user.getEmail());
-        if (dbUser == null) {
-            throw new RuntimeException("User is not found in database");
-        }
-        return null;
 
+
+    @Override
+    public Cart removeProductFromCart(User user, int productId) {
+        if (user == null) throw new RuntimeException("User is null. Please login first");
+
+        User dbUser = userService.getUser(user.getEmail());
+        if (dbUser == null) throw new RuntimeException("User not found in database");
+
+        Cart cart = dbUser.getCart();
+        if (cart == null || cart.getProducts() == null || cart.getProducts().isEmpty()) {
+            throw new RuntimeException("Cart is empty");
+        }
+
+        Iterator<Product> iterator = cart.getProducts().iterator();
+        boolean found = false;
+        while (iterator.hasNext()) {
+            Product p = iterator.next();
+            if (p.getId() == productId) {
+
+                iterator.remove();
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            throw new RuntimeException("Product not found in cart");
+        }
+        cartRepo.save(cart);
+        userService.saveUser(dbUser);
+        return cart;
     }
 }

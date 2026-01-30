@@ -7,9 +7,18 @@ import jakarta.persistence.*;
 @Table(name="products")
 public class Product {
 
+
     @Id
     @GeneratedValue
     int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
     String productName;
     int quantity;
     String Description;
