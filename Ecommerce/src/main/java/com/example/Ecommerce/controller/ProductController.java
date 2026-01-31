@@ -25,7 +25,6 @@ public class ProductController {
         this.Repo = Repo;
         this.dataService = dataService;
     }
-
     @GetMapping("/GetProducts")
     public List<Product> findAll() {
         return Repo.findAll();

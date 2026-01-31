@@ -78,8 +78,9 @@ public class CartService implements IcartServiceImp {
         boolean found = false;
         while (iterator.hasNext()) {
             Product p = iterator.next();
+            System.out.println("Removing product " + p.getId());
             if (p.getId() == productId) {
-
+               System.out.println("Removing product " + p.getId());
                 iterator.remove();
                 found = true;
                 break;

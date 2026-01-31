@@ -16,8 +16,9 @@ public class ProductsData {
 
     private String productName;
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT")
     private String description;
+
 
     private float price;
 

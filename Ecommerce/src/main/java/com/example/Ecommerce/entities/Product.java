@@ -21,6 +21,8 @@ public class Product {
     }
     String productName;
     int quantity;
+
+    @Column(columnDefinition = "TEXT")
     String Description;
     float price;
    // String productName;
